@@ -17,63 +17,69 @@ Details:
 
 from datetime import datetime, timedelta
 
-def get_valid_date():
+def get_valid_date(prompt="Enter a date in YYYY-MM-DD format (e.g., 2025-01-29): "):
+    """Get and validate a date input from the user."""
     while True:
-        # Ask the user for input in a specific format
-        date_str = input("Enter a date in YYYY-MM-DD format (e.g., 2025-01-29): ")
+        date_str = input(prompt)
         try:
-            # Try to convert the string to a datetime object
-            # %Y = 4-digit year, %m = 2-digit month, %d = 2-digit day
-            date_object = datetime.strptime(date_str, "%Y-%m-%d").date()
-            # If successful, break the loop and return the date object
-            return date_object
+            return datetime.strptime(date_str, "%Y-%m-%d").date()
         except ValueError:
-            # If the format is incorrect, print an error and the loop continues
             print("Invalid date format. Please use YYYY-MM-DD.")
 
 def get_options():
+    """Get and validate the user's operation choice."""
     while True:
-         options = input("""
-What do you want to do ?
+        options = input("""
+What do you want to do?
     1) Calculate future date after N days
     2) Calculate days lapse between two dates
 ? """)
-         try:
-             option = int(options)
-             if (option >=1 and option <= 2):
-                 return option
-             else:
-                 print("Enter a valid selection 1 or 2")
-         except ValueError:
-             print("Enter a valid selection 1 or 2")
+        try:
+            option = int(options)
+            if 1 <= option <= 2:
+                return option
+            print("Enter a valid selection 1 or 2")
+        except ValueError:
+            print("Enter a valid selection 1 or 2")
 
-
-def calculate_future_date():
+def get_positive_integer(prompt):
+    """Get and validate a positive integer input from the user."""
     while True:
         try:
-            days_to_add = int(input (f"How many days after {start_date} ? "))
-            future_date = start_date + timedelta(days=days_to_add)
-            return future_date
-        except:
-            print("Enter valid integer number")
+            value = int(input(prompt))
+            if value > 0:
+                return value
+            print("Enter a positive integer")
+        except ValueError:
+            print("Enter a positive integer")
 
-def calculate_days_lapse():
-    print(f"Enter end date > {start_date}")
+def calculate_future_date(start_date):
+    """Calculate a future date by adding N days to the start date."""
+    days_to_add = get_positive_integer(f"How many days after {start_date}? ")
+    return start_date + timedelta(days=days_to_add)
+
+def calculate_days_lapse(start_date):
+    """Calculate days lapsed between start date and end date."""
+    print(f"Enter end date (must be after {start_date})")
     while True:
-        end_date = get_valid_date()
-        if (end_date > start_date):
-            delta = end_date - start_date
-            return delta.days
-        else:
-            print(f"Enter end date > {start_date}")
+        end_date = get_valid_date("Enter end date in YYYY-MM-DD format: ")
+        if end_date > start_date:
+            return (end_date - start_date).days
+        print(f"End date must be after {start_date}")
 
-# Call the function to get the date
-print("Enter start date: ")
-start_date = get_valid_date()
-option = get_options()
-# map the inputs to the function blocks
-switcher = {1 : calculate_future_date, 
-            2 : calculate_days_lapse,
-            }
-result = switcher.get(option, lambda: "unknown")()
-print(result)
+def main():
+    """Main function to run the date calculator."""
+    print("Enter start date:")
+    start_date = get_valid_date()
+    option = get_options()
+
+    # Execute the appropriate operation
+    if option == 1:
+        result = calculate_future_date(start_date)
+    else:
+        result = calculate_days_lapse(start_date)
+
+    print(result)
+
+if __name__ == "__main__":
+    main()
